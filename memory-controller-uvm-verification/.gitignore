@@ -1,0 +1,101 @@
+# ==============================
+# Simulation Files
+# ==============================
+
+*.vcd
+*.wlf
+*.vpd
+*.fsdb
+*.log
+*.jou
+*.pb
+*.str
+*.wdb
+
+# Waveform / simulation outputs
+sim/work/
+sim/transcript
+sim/*.log
+sim/*.wlf
+
+# ==============================
+# Vivado
+# ==============================
+
+.vivado/
+*.xpr
+*.xpr.user
+*.runs/
+*.cache/
+*.hw/
+*.ip_user_files/
+*.sim/
+*.gen/
+*.srcs/
+*.jou
+*.str
+
+# Vivado generated files
+*.dcp
+*.bit
+*.ltx
+*.xsa
+
+# ==============================
+# ModelSim / Questa
+# ==============================
+
+work/
+transcript
+modelsim.ini
+*.mpf
+*.wlf
+
+# ==============================
+# Verilator
+# ==============================
+
+obj_dir/
+verilated.mk
+Verilator_*
+
+# ==============================
+# Coverage
+# ==============================
+
+coverage/
+*.ucdb
+*.vdb
+
+# ==============================
+# Temporary Files
+# ==============================
+
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# ==============================
+# OS Files
+# ==============================
+
+.DS_Store
+Thumbs.db
+
+# ==============================
+# IDE / Editor
+# ==============================
+
+.vscode/
+.idea/
+
+# ==============================
+# Python
+# ==============================
+
+__pycache__/
+*.pyc
+.venv/
+venv/   
