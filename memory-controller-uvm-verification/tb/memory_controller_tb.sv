@@ -48,7 +48,6 @@ module memory_controller_tb;
     // ---------------------------------------------------------
     initial begin
         clk = 1'b0;
-
         forever #5 clk = ~clk;
     end
 
@@ -66,13 +65,13 @@ module memory_controller_tb;
         addr     = '0;
         wdata    = '0;
 
+        $display("========================================");
+        $display(" TEST 3: BOUNDARY ADDRESS & DATA PATTERN");
+        $display("========================================");
+
         // -----------------------------------------------------
         // Reset
         // -----------------------------------------------------
-        $display("========================================");
-        $display("   TEST 2: MULTIPLE MEMORY LOCATIONS");
-        $display("========================================");
-
         $display("Applying reset...");
 
         #20;
@@ -84,18 +83,19 @@ module memory_controller_tb;
 
 
         // =====================================================
-        // WRITE OPERATION 1
-        // Address 0 -> 12345678
+        // WRITE 1
+        // Address 0
+        // Data 00000000
         // =====================================================
 
-        $display("WRITE 1: Address = 0, Data = 12345678");
+        $display("WRITE 1: Address = 0, Data = 00000000");
 
         @(negedge clk);
 
         valid    = 1'b1;
         write_en = 1'b1;
         addr     = 8'd0;
-        wdata    = 32'h12345678;
+        wdata    = 32'h00000000;
 
         @(negedge clk);
 
@@ -105,17 +105,40 @@ module memory_controller_tb;
 
 
         // =====================================================
-        // WRITE OPERATION 2
-        // Address 10 -> AAAAAAAA
+        // WRITE 2
+        // Address 1
+        // Data FFFFFFFF
         // =====================================================
 
-        $display("WRITE 2: Address = 10, Data = AAAAAAAA");
+        $display("WRITE 2: Address = 1, Data = FFFFFFFF");
 
         @(negedge clk);
 
         valid    = 1'b1;
         write_en = 1'b1;
-        addr     = 8'd10;
+        addr     = 8'd1;
+        wdata    = 32'hFFFFFFFF;
+
+        @(negedge clk);
+
+        valid = 1'b0;
+
+        wait(done == 1'b1);
+
+
+        // =====================================================
+        // WRITE 3
+        // Address 254
+        // Data AAAAAAAA
+        // =====================================================
+
+        $display("WRITE 3: Address = 254, Data = AAAAAAAA");
+
+        @(negedge clk);
+
+        valid    = 1'b1;
+        write_en = 1'b1;
+        addr     = 8'd254;
         wdata    = 32'hAAAAAAAA;
 
         @(negedge clk);
@@ -126,17 +149,18 @@ module memory_controller_tb;
 
 
         // =====================================================
-        // WRITE OPERATION 3
-        // Address 25 -> 55555555
+        // WRITE 4
+        // Address 255
+        // Data 55555555
         // =====================================================
 
-        $display("WRITE 3: Address = 25, Data = 55555555");
+        $display("WRITE 4: Address = 255, Data = 55555555");
 
         @(negedge clk);
 
         valid    = 1'b1;
         write_en = 1'b1;
-        addr     = 8'd25;
+        addr     = 8'd255;
         wdata    = 32'h55555555;
 
         @(negedge clk);
@@ -146,55 +170,14 @@ module memory_controller_tb;
         wait(done == 1'b1);
 
 
-        // =====================================================
-        // WRITE OPERATION 4
-        // Address 100 -> DEADBEEF
-        // =====================================================
-
-        $display("WRITE 4: Address = 100, Data = DEADBEEF");
-
-        @(negedge clk);
-
-        valid    = 1'b1;
-        write_en = 1'b1;
-        addr     = 8'd100;
-        wdata    = 32'hDEADBEEF;
-
-        @(negedge clk);
-
-        valid = 1'b0;
-
-        wait(done == 1'b1);
-
-
-        // =====================================================
-        // WRITE OPERATION 5
-        // Address 255 -> FFFFFFFF
-        // =====================================================
-
-        $display("WRITE 5: Address = 255, Data = FFFFFFFF");
-
-        @(negedge clk);
-
-        valid    = 1'b1;
-        write_en = 1'b1;
-        addr     = 8'd255;
-        wdata    = 32'hFFFFFFFF;
-
-        @(negedge clk);
-
-        valid = 1'b0;
-
-        wait(done == 1'b1);
-
-
         $display("----------------------------------------");
-        $display("All WRITE operations completed.");
+        $display("All boundary WRITE operations completed.");
         $display("----------------------------------------");
 
 
         // =====================================================
-        // READ OPERATION 1
+        // READ 1
+        // Address 0
         // =====================================================
 
         $display("READ 1: Address = 0");
@@ -213,23 +196,51 @@ module memory_controller_tb;
 
         #1;
 
-        if (rdata === 32'h12345678)
+        if (rdata === 32'h00000000)
             $display("PASS: Address 0 -> %h", rdata);
         else
-            $display("FAIL: Address 0 -> Expected 12345678, Got %h", rdata);
+            $display("FAIL: Address 0 -> Expected 00000000, Got %h", rdata);
 
 
         // =====================================================
-        // READ OPERATION 2
+        // READ 2
+        // Address 1
         // =====================================================
 
-        $display("READ 2: Address = 10");
+        $display("READ 2: Address = 1");
 
         @(negedge clk);
 
         valid    = 1'b1;
         write_en = 1'b0;
-        addr     = 8'd10;
+        addr     = 8'd1;
+
+        @(negedge clk);
+
+        valid = 1'b0;
+
+        wait(done == 1'b1);
+
+        #1;
+
+        if (rdata === 32'hFFFFFFFF)
+            $display("PASS: Address 1 -> %h", rdata);
+        else
+            $display("FAIL: Address 1 -> Expected FFFFFFFF, Got %h", rdata);
+
+
+        // =====================================================
+        // READ 3
+        // Address 254
+        // =====================================================
+
+        $display("READ 3: Address = 254");
+
+        @(negedge clk);
+
+        valid    = 1'b1;
+        write_en = 1'b0;
+        addr     = 8'd254;
 
         @(negedge clk);
 
@@ -240,68 +251,17 @@ module memory_controller_tb;
         #1;
 
         if (rdata === 32'hAAAAAAAA)
-            $display("PASS: Address 10 -> %h", rdata);
+            $display("PASS: Address 254 -> %h", rdata);
         else
-            $display("FAIL: Address 10 -> Expected AAAAAAAA, Got %h", rdata);
+            $display("FAIL: Address 254 -> Expected AAAAAAAA, Got %h", rdata);
 
 
         // =====================================================
-        // READ OPERATION 3
+        // READ 4
+        // Address 255
         // =====================================================
 
-        $display("READ 3: Address = 25");
-
-        @(negedge clk);
-
-        valid    = 1'b1;
-        write_en = 1'b0;
-        addr     = 8'd25;
-
-        @(negedge clk);
-
-        valid = 1'b0;
-
-        wait(done == 1'b1);
-
-        #1;
-
-        if (rdata === 32'h55555555)
-            $display("PASS: Address 25 -> %h", rdata);
-        else
-            $display("FAIL: Address 25 -> Expected 55555555, Got %h", rdata);
-
-
-        // =====================================================
-        // READ OPERATION 4
-        // =====================================================
-
-        $display("READ 4: Address = 100");
-
-        @(negedge clk);
-
-        valid    = 1'b1;
-        write_en = 1'b0;
-        addr     = 8'd100;
-
-        @(negedge clk);
-
-        valid = 1'b0;
-
-        wait(done == 1'b1);
-
-        #1;
-
-        if (rdata === 32'hDEADBEEF)
-            $display("PASS: Address 100 -> %h", rdata);
-        else
-            $display("FAIL: Address 100 -> Expected DEADBEEF, Got %h", rdata);
-
-
-        // =====================================================
-        // READ OPERATION 5
-        // =====================================================
-
-        $display("READ 5: Address = 255");
+        $display("READ 4: Address = 255");
 
         @(negedge clk);
 
@@ -317,10 +277,10 @@ module memory_controller_tb;
 
         #1;
 
-        if (rdata === 32'hFFFFFFFF)
+        if (rdata === 32'h55555555)
             $display("PASS: Address 255 -> %h", rdata);
         else
-            $display("FAIL: Address 255 -> Expected FFFFFFFF, Got %h", rdata);
+            $display("FAIL: Address 255 -> Expected 55555555, Got %h", rdata);
 
 
         // -----------------------------------------------------
@@ -328,9 +288,13 @@ module memory_controller_tb;
         // -----------------------------------------------------
 
         $display("----------------------------------------");
-        $display("TEST 2 COMPLETED");
+        $display("TEST 3 COMPLETED");
         $display("----------------------------------------");
+
         #20;
+
         $finish;
+
     end
+
 endmodule
