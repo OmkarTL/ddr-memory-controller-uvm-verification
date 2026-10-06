@@ -38,7 +38,7 @@ module memory_controller_tb;
     );
 
     // ---------------------------------------------------------
-    // Clock
+    // Clock generation
     // ---------------------------------------------------------
     initial begin
         clk = 1'b0;
@@ -60,7 +60,7 @@ module memory_controller_tb;
         fail_count = 0;
 
         $display("========================================");
-        $display(" TEST 5: READ-AFTER-WRITE VERIFICATION");
+        $display(" TEST 6: DATA INTEGRITY & MEMORY ISOLATION");
         $display("========================================");
 
         // -----------------------------------------------------
@@ -77,201 +77,295 @@ module memory_controller_tb;
 
 
         // =====================================================
-        // TEST PAIR 1
-        // Address 50
+        // INITIAL WRITE OPERATIONS
         // =====================================================
 
-        $display("WRITE 1: Address = 50, Data = CAFEBABE");
+        $display("WRITE 1: Address = 40, Data = AAAAAAAA");
 
         @(negedge clk);
-
         valid    = 1'b1;
         write_en = 1'b1;
-        addr     = 8'd50;
-        wdata    = 32'hCAFEBABE;
-
-        @(negedge clk);
-
-        valid = 1'b0;
-
-        wait(done == 1'b1);
-
-        $display("READ 1: Address = 50");
-
-        @(negedge clk);
-
-        valid    = 1'b1;
-        write_en = 1'b0;
-        addr     = 8'd50;
-
-        @(negedge clk);
-
-        valid = 1'b0;
-
-        wait(done == 1'b1);
-
-        #1;
-
-        if (rdata === 32'hCAFEBABE) begin
-            $display("PASS: Address 50 -> %h", rdata);
-            pass_count = pass_count + 1;
-        end
-        else begin
-            $display("FAIL: Address 50 -> Expected CAFEBABE, Got %h", rdata);
-            fail_count = fail_count + 1;
-        end
-
-
-        // =====================================================
-        // TEST PAIR 2
-        // Address 75
-        // =====================================================
-
-        $display("----------------------------------------");
-
-        $display("WRITE 2: Address = 75, Data = 12345678");
-
-        @(negedge clk);
-
-        valid    = 1'b1;
-        write_en = 1'b1;
-        addr     = 8'd75;
-        wdata    = 32'h12345678;
-
-        @(negedge clk);
-
-        valid = 1'b0;
-
-        wait(done == 1'b1);
-
-        $display("READ 2: Address = 75");
-
-        @(negedge clk);
-
-        valid    = 1'b1;
-        write_en = 1'b0;
-        addr     = 8'd75;
-
-        @(negedge clk);
-
-        valid = 1'b0;
-
-        wait(done == 1'b1);
-
-        #1;
-
-        if (rdata === 32'h12345678) begin
-            $display("PASS: Address 75 -> %h", rdata);
-            pass_count = pass_count + 1;
-        end
-        else begin
-            $display("FAIL: Address 75 -> Expected 12345678, Got %h", rdata);
-            fail_count = fail_count + 1;
-        end
-
-
-        // =====================================================
-        // TEST PAIR 3
-        // Address 100
-        // =====================================================
-
-        $display("----------------------------------------");
-
-        $display("WRITE 3: Address = 100, Data = DEADBEEF");
-
-        @(negedge clk);
-
-        valid    = 1'b1;
-        write_en = 1'b1;
-        addr     = 8'd100;
-        wdata    = 32'hDEADBEEF;
-
-        @(negedge clk);
-
-        valid = 1'b0;
-
-        wait(done == 1'b1);
-
-        $display("READ 3: Address = 100");
-
-        @(negedge clk);
-
-        valid    = 1'b1;
-        write_en = 1'b0;
-        addr     = 8'd100;
-
-        @(negedge clk);
-
-        valid = 1'b0;
-
-        wait(done == 1'b1);
-
-        #1;
-
-        if (rdata === 32'hDEADBEEF) begin
-            $display("PASS: Address 100 -> %h", rdata);
-            pass_count = pass_count + 1;
-        end
-        else begin
-            $display("FAIL: Address 100 -> Expected DEADBEEF, Got %h", rdata);
-            fail_count = fail_count + 1;
-        end
-
-
-        // =====================================================
-        // TEST PAIR 4
-        // Address 150
-        // =====================================================
-
-        $display("----------------------------------------");
-
-        $display("WRITE 4: Address = 150, Data = AAAAAAAA");
-
-        @(negedge clk);
-
-        valid    = 1'b1;
-        write_en = 1'b1;
-        addr     = 8'd150;
+        addr     = 8'd40;
         wdata    = 32'hAAAAAAAA;
 
         @(negedge clk);
-
         valid = 1'b0;
 
         wait(done == 1'b1);
 
-        $display("READ 4: Address = 150");
+
+        $display("WRITE 2: Address = 41, Data = 55555555");
 
         @(negedge clk);
+        valid    = 1'b1;
+        write_en = 1'b1;
+        addr     = 8'd41;
+        wdata    = 32'h55555555;
 
+        @(negedge clk);
+        valid = 1'b0;
+
+        wait(done == 1'b1);
+
+
+        $display("WRITE 3: Address = 42, Data = 12345678");
+
+        @(negedge clk);
+        valid    = 1'b1;
+        write_en = 1'b1;
+        addr     = 8'd42;
+        wdata    = 32'h12345678;
+
+        @(negedge clk);
+        valid = 1'b0;
+
+        wait(done == 1'b1);
+
+
+        $display("WRITE 4: Address = 43, Data = DEADBEEF");
+
+        @(negedge clk);
+        valid    = 1'b1;
+        write_en = 1'b1;
+        addr     = 8'd43;
+        wdata    = 32'hDEADBEEF;
+
+        @(negedge clk);
+        valid = 1'b0;
+
+        wait(done == 1'b1);
+
+        $display("----------------------------------------");
+        $display("Initial memory contents written.");
+        $display("----------------------------------------");
+
+
+        // =====================================================
+        // FIRST READBACK
+        // =====================================================
+
+        $display("READ 1: Address = 40");
+
+        @(negedge clk);
         valid    = 1'b1;
         write_en = 1'b0;
-        addr     = 8'd150;
+        addr     = 8'd40;
 
         @(negedge clk);
-
         valid = 1'b0;
 
         wait(done == 1'b1);
-
         #1;
 
         if (rdata === 32'hAAAAAAAA) begin
-            $display("PASS: Address 150 -> %h", rdata);
+            $display("PASS: Address 40 -> %h", rdata);
             pass_count = pass_count + 1;
         end
         else begin
-            $display("FAIL: Address 150 -> Expected AAAAAAAA, Got %h", rdata);
+            $display("FAIL: Address 40 -> Expected AAAAAAAA, Got %h", rdata);
             fail_count = fail_count + 1;
         end
 
 
-        // -----------------------------------------------------
-        // Final Result
-        // -----------------------------------------------------
+        $display("READ 2: Address = 41");
+
+        @(negedge clk);
+        valid    = 1'b1;
+        write_en = 1'b0;
+        addr     = 8'd41;
+
+        @(negedge clk);
+        valid = 1'b0;
+
+        wait(done == 1'b1);
+        #1;
+
+        if (rdata === 32'h55555555) begin
+            $display("PASS: Address 41 -> %h", rdata);
+            pass_count = pass_count + 1;
+        end
+        else begin
+            $display("FAIL: Address 41 -> Expected 55555555, Got %h", rdata);
+            fail_count = fail_count + 1;
+        end
+
+
+        $display("READ 3: Address = 42");
+
+        @(negedge clk);
+        valid    = 1'b1;
+        write_en = 1'b0;
+        addr     = 8'd42;
+
+        @(negedge clk);
+        valid = 1'b0;
+
+        wait(done == 1'b1);
+        #1;
+
+        if (rdata === 32'h12345678) begin
+            $display("PASS: Address 42 -> %h", rdata);
+            pass_count = pass_count + 1;
+        end
+        else begin
+            $display("FAIL: Address 42 -> Expected 12345678, Got %h", rdata);
+            fail_count = fail_count + 1;
+        end
+
+
+        $display("READ 4: Address = 43");
+
+        @(negedge clk);
+        valid    = 1'b1;
+        write_en = 1'b0;
+        addr     = 8'd43;
+
+        @(negedge clk);
+        valid = 1'b0;
+
+        wait(done == 1'b1);
+        #1;
+
+        if (rdata === 32'hDEADBEEF) begin
+            $display("PASS: Address 43 -> %h", rdata);
+            pass_count = pass_count + 1;
+        end
+        else begin
+            $display("FAIL: Address 43 -> Expected DEADBEEF, Got %h", rdata);
+            fail_count = fail_count + 1;
+        end
+
+
+        // =====================================================
+        // OVERWRITE ONLY ADDRESS 41
+        // =====================================================
 
         $display("----------------------------------------");
-        $display("TEST 5 RESULTS");
+        $display("Overwriting Address 41...");
+        $display("WRITE: Address = 41, Data = F0F0F0F0");
+
+        @(negedge clk);
+        valid    = 1'b1;
+        write_en = 1'b1;
+        addr     = 8'd41;
+        wdata    = 32'hF0F0F0F0;
+
+        @(negedge clk);
+        valid = 1'b0;
+
+        wait(done == 1'b1);
+
+        $display("----------------------------------------");
+        $display("Verifying memory isolation...");
+        $display("----------------------------------------");
+
+
+        // =====================================================
+        // SECOND READBACK
+        // =====================================================
+
+        // Address 40 must remain unchanged
+        $display("READ: Address = 40");
+
+        @(negedge clk);
+        valid    = 1'b1;
+        write_en = 1'b0;
+        addr     = 8'd40;
+
+        @(negedge clk);
+        valid = 1'b0;
+
+        wait(done == 1'b1);
+        #1;
+
+        if (rdata === 32'hAAAAAAAA) begin
+            $display("PASS: Address 40 unchanged -> %h", rdata);
+            pass_count = pass_count + 1;
+        end
+        else begin
+            $display("FAIL: Address 40 corrupted -> %h", rdata);
+            fail_count = fail_count + 1;
+        end
+
+
+        // Address 41 must contain new data
+        $display("READ: Address = 41");
+
+        @(negedge clk);
+        valid    = 1'b1;
+        write_en = 1'b0;
+        addr     = 8'd41;
+
+        @(negedge clk);
+        valid = 1'b0;
+
+        wait(done == 1'b1);
+        #1;
+
+        if (rdata === 32'hF0F0F0F0) begin
+            $display("PASS: Address 41 updated -> %h", rdata);
+            pass_count = pass_count + 1;
+        end
+        else begin
+            $display("FAIL: Address 41 update failed -> %h", rdata);
+            fail_count = fail_count + 1;
+        end
+
+
+        // Address 42 must remain unchanged
+        $display("READ: Address = 42");
+
+        @(negedge clk);
+        valid    = 1'b1;
+        write_en = 1'b0;
+        addr     = 8'd42;
+
+        @(negedge clk);
+        valid = 1'b0;
+
+        wait(done == 1'b1);
+        #1;
+
+        if (rdata === 32'h12345678) begin
+            $display("PASS: Address 42 unchanged -> %h", rdata);
+            pass_count = pass_count + 1;
+        end
+        else begin
+            $display("FAIL: Address 42 corrupted -> %h", rdata);
+            fail_count = fail_count + 1;
+        end
+
+
+        // Address 43 must remain unchanged
+        $display("READ: Address = 43");
+
+        @(negedge clk);
+        valid    = 1'b1;
+        write_en = 1'b0;
+        addr     = 8'd43;
+
+        @(negedge clk);
+        valid = 1'b0;
+
+        wait(done == 1'b1);
+        #1;
+
+        if (rdata === 32'hDEADBEEF) begin
+            $display("PASS: Address 43 unchanged -> %h", rdata);
+            pass_count = pass_count + 1;
+        end
+        else begin
+            $display("FAIL: Address 43 corrupted -> %h", rdata);
+            fail_count = fail_count + 1;
+        end
+
+
+        // =====================================================
+        // FINAL RESULT
+        // =====================================================
+
+        $display("----------------------------------------");
+        $display("TEST 6 RESULTS");
         $display("----------------------------------------");
 
         $display("PASS COUNT : %0d", pass_count);
@@ -279,12 +373,12 @@ module memory_controller_tb;
 
         if (fail_count == 0) begin
             $display("========================================");
-            $display("          TEST 5 PASSED");
+            $display("          TEST 6 PASSED");
             $display("========================================");
         end
         else begin
             $display("========================================");
-            $display("          TEST 5 FAILED");
+            $display("          TEST 6 FAILED");
             $display("========================================");
         end
 
@@ -294,4 +388,4 @@ module memory_controller_tb;
 
     end
 
-endmodule
+endmodule   
